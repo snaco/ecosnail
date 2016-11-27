@@ -1,3 +1,3 @@
-[submodule "uniconf"]
-	path = projects/uniconf
-	url = git@bitbucket.org:ecosnail/uniconf.git
+[submodule "config"]
+	path = config
+	url = git@bitbucket.org:ecosnail/config.git
