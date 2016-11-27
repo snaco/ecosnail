@@ -1,3 +1,3 @@
 [submodule "uniconf"]
-	path = uniconf
-	url = git@bitbucket.org:snailbaron/uniconf.git
+	path = projects/uniconf
+	url = git@bitbucket.org:ecosnail/uniconf.git
