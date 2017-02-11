@@ -1,3 +1,6 @@
 [submodule "config"]
 	path = config
 	url = git@bitbucket.org:ecosnail/config.git
+[submodule "containers"]
+	path = containers
+	url = ssh://git@bitbucket.org/ecosnail/containers.git
