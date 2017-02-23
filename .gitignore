@@ -1,0 +1,6 @@
+.vs/
+bin/
+build/
+*.VC.db
+*.VC.opendb
+*.swp

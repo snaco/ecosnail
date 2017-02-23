@@ -1,6 +1,12 @@
-[submodule "config"]
-	path = config
+[submodule "projects/blabla"]
+	path = projects/blabla
+	url = git@bitbucket.org:ecosnail/blabla.git
+[submodule "projects/config"]
+	path = projects/config
 	url = git@bitbucket.org:ecosnail/config.git
-[submodule "containers"]
-	path = containers
-	url = ssh://git@bitbucket.org/ecosnail/containers.git
+[submodule "projects/containers"]
+	path = projects/containers
+	url = git@bitbucket.org:ecosnail/containers.git
+[submodule "projects/nono"]
+	path = projects/nono
+	url = git@bitbucket.org:snailbaron/nono.git
