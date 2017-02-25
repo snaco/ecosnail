@@ -4,9 +4,9 @@
 [submodule "projects/config"]
 	path = projects/config
 	url = git@bitbucket.org:ecosnail/config.git
-[submodule "projects/containers"]
-	path = projects/containers
-	url = git@bitbucket.org:ecosnail/containers.git
 [submodule "projects/nono"]
 	path = projects/nono
 	url = git@bitbucket.org:snailbaron/nono.git
+[submodule "projects/tail"]
+	path = projects/tail
+	url = git@bitbucket.org:ecosnail/tail.git
