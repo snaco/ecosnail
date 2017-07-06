@@ -1,0 +1,7 @@
+DOXYFILE_ENCODING      = UTF-8
+PROJECT_NAME           = "Snail Ecosystem: Configurator"
+OUTPUT_DIRECTORY       = doc
+GENERATE_LATEX         = NO
+INPUT                  = include/ecosnail
+INPUT_ENCODING         = UTF-8
+RECURSIVE              = YES

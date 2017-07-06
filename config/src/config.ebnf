@@ -1,0 +1,27 @@
+(*
+ * The grammar below does not take commanes into account.
+ *
+ * Comment is starts with a "#" character, and spans to the end of line, which
+ * is one of the following:
+ * * LF (0x0A, 10)
+ * * CR (0x0D, 13)
+ * * End of file
+ *)
+
+(* Configuration file grammar *)
+element    = scalar | sequence | dictionary | structure ;
+scalar     = token_character, { token_character } ;
+sequence   = "[", { element }, "]" ;
+dictionary = "{", { element, "=>", element }, "}" ;
+structure  = "<", { element, "=", element }, ">" ;
+
+(* Lexical conventions *)
+token_character = ? any visible character ? ;
+string_simple_character = ? any visible character except backslash (\) and double quote (") ? ;
+string_character = string_simple_character | '\', '\' | '\', '"' ;
+
+sequence_start = '[' ;
+sequence_end = ']' ;
+dic_start = '{' ;
+dic_equ = '=>' ;
+dic_end = '}' ;
