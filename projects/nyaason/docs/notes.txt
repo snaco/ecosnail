@@ -1,0 +1,59 @@
+Notes on format
+---------------
+
+NOTES MAY BE OUTDATED. GRAMMAR HAS HIGHER PRIORITY ANY TIME.
+
+Tokens:
+  * Newlines are not treated specially.
+  * Tokens are separated by whitespace characters.
+
+Types:
+  * Expressions have different types.
+  * There is a usual set of built-in types (numbers, strings, lists,
+    dictionaries).
+  * Additional structure-like (record-like) types may be used. These types may
+    be defined in a schema, separate from the document.
+
+Primitive types:
+ 1. Integer value: 0, 1, -3, +120, 12345676543456, 123'456
+    * '-' or (optional) '+' at the beginning.
+    * Optional quote (') separators, but not on edges.
+    * Size is not restricted by format.
+
+ 2. Decimal value: 1/2, -4/3, 128, 3/1'000'000
+    * Exactly one '/'. Otherwise, it's an integer.
+    * '-' or (optional) '+' at the beginning.
+    * Quote separators are also possible.
+
+ 3. Floating-point values: 1.0, -2., .567, 123e+10, -E-20, 1'234e-2'0
+    * Dot (.) or scientific (e) notation.
+    * Digits before or after the dot are optional.
+    * '+' in 'e' part is optional.
+    * Uppercase or lowercase 'e' may be used.
+
+ 4. Strings: 'ab', "abcde", "zom zom", "привет", hello, "I \"know\""
+    * Quotes are optional. Anything resembling a string is a string, unless it
+      matches another token. Whitespace characters are impossible to insert into
+      a string this way.
+    * Single (') or double (") quotes may be used interchangeably. They may help
+      each other when the string itself contains quotes. For example:
+          'ab"c' produces string [ab"c].
+    * Backslash is used to escape quotes of the same type as the top-level ones.
+      It also escapes itself. Other uses of backslash are invalid. For example:
+          'ab\c' is an invalid string.
+          'a\\b\'c"d' produces string [a\b'c"d].
+
+Complex built-in types:
+ 1. Lists: [a, b, c, d]
+ 2. Dictionaries: {a : b, c : d}
+
+Optional comma may be inserted at the end of a list or a dictionary:
+    [a, b, c,]
+    {a:b,}
+It does not produce an extra "empty" element. In fact, there are no such
+elements.
+
+Structures: {id1 = b, id2 = d}
+  * Same braces as for a dictionary.
+  * Identificators (on the left side of '=') must conform to the usual
+    identificator rules (think C identificators).

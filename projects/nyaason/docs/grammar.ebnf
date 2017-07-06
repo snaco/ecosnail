@@ -1,0 +1,95 @@
+(* Helper character classes and subexpressions *)
+(* ------------------------------------------- *)
+
+(* Character classes *)
+
+DEC_DIGIT = '0' , '1' , '2' , '3' , '4' , '5' , '6' , '7' , '8' , '9' ;
+
+WHITESPACE = ? whitespace characters, as in C:
+               * space (0x20)
+               * form feed (0x0c)
+               * line feed (0x0a)
+               * carriage return (0x0d)
+               * horizontal tab (0x09)
+               * vertical tab (0x0b) ?
+             ;
+
+NON_WHITESPACE = ? all except WHITESPACE ? ;
+
+PLAIN_STRING_CHAR = ? all except WHITESPACE, and quotes (' and ") ? ;
+
+STRING_SPECIAL_CHAR = '"' | "'" | "\" ;
+STRING_REGULAR_CHAR = ? all except STRING_SPECIAL_CHAR ? ;
+
+Q_STRING_CHAR = STRING_REGULAR_CHAR
+              | '"'
+              | "\", "'",
+              | "\", "\"
+              | "\", "b"
+              | "\", "f"
+              | "\", "n"
+              | "\", "r"
+              | "\", "t"
+              ; (* TODO: Add \uXXXX like in JSON? *)
+
+QQ_STRING_CHAR = STRING_REGULAR_CHAR
+              | "'"
+              | "\", '"',
+              | "\", "\"
+              | "\", "b"
+              | "\", "f"
+              | "\", "n"
+              | "\", "r"
+              | "\", "t"
+              ; (* TODO: Add \uXXXX like in JSON? *)
+
+(* Special expressions for numerical tokens *)
+
+INT = [ SIGN ] , DIGIT , { DIGIT } ;
+FRAC = DOT , DIGIT , { DIGIT } ;
+EXP = E , [ SIGN ] , DIGIT , { DIGIT } ;
+SIGN = "+" | "-" ;
+DOT = "." ;
+E = "e" | "E" ;
+
+(* Tokens *)
+(* ------ *)
+
+(* Special characters for object construction *)
+
+list_start = "[" ;
+list_end = "]" ;
+dic_start = "{" ;
+dic_end = "}" ;
+key_value_sep = ":" , "=" ;
+
+(* Numerical tokens syntax *)
+
+number = INT , [ [ FRAC ] , EXP ] ;
+
+(* Plain (non-quoted) strings syntax *)
+
+plain_string = PLAIN_STRING_CHAR, { PLAIN_STRING_CHAR } ;
+
+(* Strings in single or double quotes *)
+
+q_string = "'", { Q_STRING_CHAR }, "'" ;
+qq_string = '"', { QQ_STRING_CHAR }, '"' ;
+
+(* Syntax part *)
+(* ----------- *)
+
+(* A document may contain a single object, or a list of key-value pairs. The
+   latter case is identical to a single dictionary. *)
+
+document = value | key_value_list ;
+
+structure = string, dictionary ;
+dictionary = dic_start , key_value_list , dic_end ;
+key_value_list = { key_value_pair } ;
+key_value_pair = value , key_value_sep , value ;
+list = list_start , { value } , list_end ;
+
+value = number | list | dictionary | structure ;
+
+string = plain_string | q_string | qq_string ;
