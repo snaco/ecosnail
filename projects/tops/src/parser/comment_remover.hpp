@@ -2,6 +2,9 @@
 
 #include <istream>
 
+namespace ecosnail {
+namespace tops {
+
 class CommentRemover {
 public:
     CommentRemover(std::istream& input);
@@ -28,3 +31,5 @@ private:
     int _line;
     int _column;
 };
+
+}} // namespace ecosnail::tops

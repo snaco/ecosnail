@@ -7,6 +7,9 @@
 #include <map>
 #include <set>
 
+namespace ecosnail {
+namespace tops {
+
 std::ostream& operator<<(std::ostream& stream, const Token& token)
 {
     static const std::map<Token::Type, std::string> typeNames{
@@ -15,6 +18,7 @@ std::ostream& operator<<(std::ostream& stream, const Token& token)
         { Token::Type::DictStart,   "DictStart"   },
         { Token::Type::DictEnd,     "DictEnd"     },
         { Token::Type::KeyValueSep, "KeyValueSep" },
+        { Token::Type::NameSep,     "NameSep"     },
         { Token::Type::String,      "String"      },
         { Token::Type::End,         "End"         },
     };
@@ -28,20 +32,20 @@ std::ostream& operator<<(std::ostream& stream, const Token& token)
     return stream;
 }
 
-Tokenizer::Tokenizer(std::istream& input)
+Lexer::Lexer(std::istream& input)
     : _input(input)
 {
     next();
 }
 
-void Tokenizer::skipWhitespace()
+void Lexer::skipWhitespace()
 {
     while (std::isspace(_current)) {
         next();
     }
 }
 
-std::string Tokenizer::fetchStringUntil(const char end)
+std::string Lexer::fetchStringUntil(const char end)
 {
     std::ostringstream value;
     next();
@@ -66,7 +70,7 @@ std::string Tokenizer::fetchStringUntil(const char end)
     return value.str();
 }
 
-std::string Tokenizer::fetchPlainString()
+std::string Lexer::fetchPlainString()
 {
     auto isPlainStringChar = [this](int c) {
         std::set<char> forbiddenChars {
@@ -84,7 +88,7 @@ std::string Tokenizer::fetchPlainString()
     return stream.str();
 }
 
-Token Tokenizer::get()
+Token Lexer::get()
 {
     // Skip to next meaningful part. 
     skipWhitespace();
@@ -97,7 +101,7 @@ Token Tokenizer::get()
         { ']', Token::Type::ListEnd },
         { '{', Token::Type::DictStart },
         { '}', Token::Type::DictEnd },
-        { ':', Token::Type::KeyValueSep },
+        { ':', Token::Type::NameSep },
         { '=', Token::Type::KeyValueSep },
     };
     
@@ -117,3 +121,31 @@ Token Tokenizer::get()
     std::string plainString = fetchPlainString();
     return { Token::Type::String, std::move(plainString) };
 }
+
+BufferedLexer::BufferedLexer(std::istream& input)
+    : _lexer(input)
+{ }
+
+Token BufferedLexer::get()
+{
+    if (!_buffer.empty()) {
+        Token token = std::move(_buffer.front());
+        _buffer.pop_front();
+        return token;
+    } else {
+        return _lexer.get();
+    }
+}
+
+const Token& BufferedLexer::peek(size_t offset)
+{
+    if (offset + 1 > _buffer.size()) {
+        for (size_t i = 0; i < offset + 1 - _buffer.size(); i++) {
+            _buffer.push_back(_lexer.get());
+        }
+    }
+
+    return _buffer[offset];
+}
+
+}} // namespace ecosnail::tops

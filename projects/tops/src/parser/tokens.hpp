@@ -8,6 +8,10 @@
 #include <memory>
 #include <utility>
 #include <typeinfo>
+#include <deque>
+
+namespace ecosnail {
+namespace tops {
 
 struct Token {
     enum class Type {
@@ -16,6 +20,7 @@ struct Token {
         DictStart,
         DictEnd,
         KeyValueSep,
+        NameSep,
         String,
         End,
     };
@@ -32,10 +37,10 @@ struct Token {
 
 std::ostream& operator<<(std::ostream& stream, const Token& token);
 
-class Tokenizer {
+class Lexer {
 public:
-    Tokenizer(std::istream& input);
-
+    Lexer(std::istream& input);
+     
     Token get();
 
 private:
@@ -53,3 +58,17 @@ private:
     CommentRemover _input;
     int _current;
 };
+
+class BufferedLexer {
+public:
+    BufferedLexer(std::istream& input);
+
+    Token get();
+    const Token& peek(size_t offset = 0);
+    
+private:
+    Lexer _lexer;
+    std::deque<Token> _buffer;
+};
+
+}} // namespace ecosnail::tops

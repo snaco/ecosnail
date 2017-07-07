@@ -1,5 +1,8 @@
 #include "comment_remover.hpp"
 
+namespace ecosnail {
+namespace tops {
+
 CommentRemover::CommentRemover(std::istream& input)
     : _input(input)
 { }
@@ -33,3 +36,4 @@ int CommentRemover::get()
     return c;
 }
 
+}} // namespace ecosnail::tops

@@ -82,14 +82,15 @@ qq_string = '"', { QQ_STRING_CHAR }, '"' ;
 (* A document may contain a single object, or a list of key-value pairs. The
    latter case is identical to a single dictionary. *)
 
-document = value | key_value_list ;
+document = { object }
+         | key_value_pair , { key_value_pair }
+         ;
 
-structure = string, dictionary ;
-dictionary = dic_start , key_value_list , dic_end ;
-key_value_list = { key_value_pair } ;
-key_value_pair = value , key_value_sep , value ;
-list = list_start , { value } , list_end ;
+object = [ STRING , NAME_SEP ] , object_value ;
+object_value = string | list | dictionary ;
 
-value = number | list | dictionary | structure ;
+string = STRING ;
+list = LIST_START , { object } , LIST_END ;
 
-string = plain_string | q_string | qq_string ;
+key_value_pair = value , KEY_VALUE_SEP , object ;
+dictionary = DICT_START , { key_value_pair } , DICT_END ;
