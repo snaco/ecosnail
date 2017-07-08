@@ -166,7 +166,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\parser\comment_remover.hpp" />
-    <ClInclude Include="include\ecosnail\tops.hpp" />
+    <ClInclude Include="src\parser\tops.hpp" />
     <ClInclude Include="src\parser\parser.hpp" />
     <ClInclude Include="src\parser\tokens.hpp" />
   </ItemGroup>

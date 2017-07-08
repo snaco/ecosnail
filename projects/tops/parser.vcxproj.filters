@@ -41,7 +41,7 @@
     <ClInclude Include="src\parser\tokens.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ecosnail\tops.hpp">
+    <ClInclude Include="src\parser\tops.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

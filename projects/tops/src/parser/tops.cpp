@@ -1,5 +1,4 @@
-#include <ecosnail/tops.hpp>
-
+#include "tops.hpp"
 #include "tokens.hpp"
 #include "parser.hpp"
 
@@ -11,14 +10,82 @@
 namespace ecosnail {
 namespace tops {
 
-Tops::Tops(std::any data)
-    : _data(std::move(data))
+const char* TopsTypeName<Tops::String>::value = "string";
+const char* TopsTypeName<Tops::List>::value = "list";
+const char* TopsTypeName<Tops::Dictionary>::value = "dictionary";
+
+Tops::Tops(Value value, std::string name)
+    : _name(std::move(name))
+    , _value(std::move(value))
 { }
 
-Tops::Tops(std::any data, std::string name)
-    : _data(std::move(data))
-    , _name(std::move(name))
-{ }
+void Tops::push_back(const Tops& value)
+{
+    requestType<List>("Tops::push_back");
+    return std::get<List>(_value).push_back(value);
+}
+
+Tops& Tops::operator[](List::size_type pos)
+{
+    requestType<List>("Tops::operator[]");
+    return std::get<List>(_value)[pos];
+}
+
+std::pair<Tops::Dictionary::iterator, bool> Tops::insert(
+    const Dictionary::value_type& value)
+{
+    requestType<Dictionary>("Tops::insert");
+    return std::get<Dictionary>(_value).insert(value);     
+}
+
+Tops& Tops::operator[](const std::string& key)
+{
+    requestType<Dictionary>("Tops::operator[]");
+    return std::get<Dictionary>(_value)[key];
+}
+
+const std::string& Tops::asString()
+{
+    requestType<String>("Tops::asString");
+    return std::get<String>(_value);
+}
+
+std::ostream& operator<<(std::ostream& stream, const Tops& tops)
+{
+    tops.prettyPrint(stream);
+    return stream;
+}
+
+void Tops::prettyPrint(std::ostream& stream, int offset, bool skipFirst) const
+{
+    if (!skipFirst) {
+        stream << std::string(offset, ' ');
+    }
+
+    if (std::holds_alternative<std::monostate>(_value)) {
+        stream << "EMPTY";
+    }
+    else if (std::holds_alternative<Tops::String>(_value)) {
+        stream << std::get<Tops::String>(_value);
+    }
+    else if (std::holds_alternative<Tops::List>(_value)) {
+        stream << "[" << std::endl;
+        for (const Tops& tops : std::get<Tops::List>(_value)) {
+            tops.prettyPrint(stream, offset + 4);
+            stream << std::endl;
+        }
+        stream << std::string(offset, ' ') << "]";
+    }
+    else if (std::holds_alternative<Tops::Dictionary>(_value)) {
+        stream << "{" << std::endl;
+        for (const auto& pair : std::get<Tops::Dictionary>(_value)) {
+            stream << std::string(offset + 4, ' ') << pair.first << " = ";
+            pair.second.prettyPrint(stream, offset + 4, true);
+            stream << std::endl;
+        }
+        stream << std::string(offset, ' ') << "}";
+    }
+}
 
 Tops parseDocument(const std::string& path)
 {
@@ -30,21 +97,6 @@ Tops parseDocument(const std::string& path)
     auto lexer = std::make_shared<BufferedLexer>(stream);
     Parser parser(lexer);
     return parser.parseDocument();
-}
-
-std::string Tops::string()
-{
-    return std::any_cast<std::string>(_data);
-}
-
-std::vector<Tops> Tops::list()
-{
-    return std::any_cast<std::vector<Tops>>(_data);
-}
-
-std::map<std::string, Tops> Tops::dictionary()
-{
-    return std::any_cast<std::map<std::string, Tops>>(_data);
 }
 
 }} // namespace ecosnail::tops

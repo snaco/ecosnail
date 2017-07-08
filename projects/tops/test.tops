@@ -1,10 +1,8 @@
 # Comment #1
 
-data: [
-    {
-        size = [1024 768]
-        color_bits = 32
-    }
+one = two
+three = four
 
-    "some numbers" : [1 2 3 10]
-]
+five = [ i wanna be your bubblegum ]
+
+"oh my god" = really

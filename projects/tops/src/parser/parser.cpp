@@ -55,22 +55,20 @@ Tops Parser::parseDocument()
 {
     if (nextTypesAre({Token::Type::String, Token::Type::KeyValueSep})) {
         // Parse key-value pairs into dictionary
-        std::map<std::string, Tops> data;
+        Tops data;
         while (nextType() == Token::Type::String) {
             data.insert(parseKeyValuePair());
         }
         request(Token::Type::End);
-
-        return Tops(std::any(data));
+        return data;
     } else {
         // Parse objects into list
-        std::vector<Tops> data;
+        Tops data;
         while (nextType() != Token::Type::End) {
             data.push_back(parseObject());
         }
         request(Token::Type::End);
-
-        return Tops(std::any(data));
+        return data;
     }
 }
 
@@ -85,12 +83,12 @@ Tops Parser::parseObject()
     }
 }
 
-std::any Parser::parseObjectValue()
+Tops::Value Parser::parseObjectValue()
 {
     switch (_tokens->peek().type) {
-        case Token::Type::String: return std::any(parseString());
-        case Token::Type::ListStart: return std::any(parseList());
-        case Token::Type::DictStart: return std::any(parseDictionary());
+        case Token::Type::String: return {parseString()};
+        case Token::Type::ListStart: return {parseList()};
+        case Token::Type::DictStart: return {parseDictionary()};
         default: reportUnexpectedToken(_tokens->get());
     }
     return {};
@@ -98,7 +96,8 @@ std::any Parser::parseObjectValue()
 
 std::string Parser::parseString()
 {
-    return _tokens->get().string;
+    std::string result = _tokens->get().string;
+    return result;
 }
 
 std::vector<Tops> Parser::parseList()
@@ -107,7 +106,8 @@ std::vector<Tops> Parser::parseList()
 
     request(Token::Type::ListStart);
     while (_tokens->peek().type != Token::Type::ListEnd) {
-        data.push_back(parseObject());
+        Tops object = parseObject();
+        data.push_back(object);
     }
     request(Token::Type::ListEnd);
 

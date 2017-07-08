@@ -1,7 +1,6 @@
 #pragma once
 
-#include <ecosnail/tops.hpp>
-
+#include "tops.hpp"
 #include "tokens.hpp"
 
 #include <memory>
@@ -29,7 +28,7 @@ private:
     bool nextTypesAre(const std::vector<Token::Type>& types);
 
     Tops parseObject();
-    std::any parseObjectValue();
+    Tops::Value parseObjectValue();
     std::string parseString();
     std::vector<Tops> parseList();
     std::map<std::string, Tops> parseDictionary();
