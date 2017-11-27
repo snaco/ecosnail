@@ -12,7 +12,6 @@ int main()
         std::cout << document << std::endl;
 
         std::cout << document["oh my god"];
-
     } catch (std::exception& e) {
         std::cerr << e.what();
         return 1;

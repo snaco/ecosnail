@@ -1,8 +1,10 @@
 # Comment #1
 
-one = two
-three = four
+{
+    one = two
+    three = four
 
-five = [ i wanna be your bubblegum ]
+    five = [ i wanna be your bubblegum ]
 
-"oh my god" = really
+    "oh my god" = really
+}

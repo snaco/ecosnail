@@ -21,33 +21,28 @@ Tops::Tops(Value value, std::string name)
 
 void Tops::push_back(const Tops& value)
 {
-    requestType<List>("Tops::push_back");
-    return std::get<List>(_value).push_back(value);
+    return get<List>().push_back(value);
 }
 
 Tops& Tops::operator[](List::size_type pos)
 {
-    requestType<List>("Tops::operator[]");
-    return std::get<List>(_value)[pos];
+    return get<List>()[pos];
 }
 
 std::pair<Tops::Dictionary::iterator, bool> Tops::insert(
     const Dictionary::value_type& value)
 {
-    requestType<Dictionary>("Tops::insert");
-    return std::get<Dictionary>(_value).insert(value);     
+    return get<Dictionary>().insert(value);
 }
 
 Tops& Tops::operator[](const std::string& key)
 {
-    requestType<Dictionary>("Tops::operator[]");
-    return std::get<Dictionary>(_value)[key];
+    return get<Dictionary>()[key];
 }
 
 const std::string& Tops::asString()
 {
-    requestType<String>("Tops::asString");
-    return std::get<String>(_value);
+    return get<String>();
 }
 
 std::ostream& operator<<(std::ostream& stream, const Tops& tops)
