@@ -1,10 +1,11 @@
+#pragma once
+
+#include <ecosnail/tail/internal/utils.hpp>
+
 /**
  * TypeSet.
  * I seriously don't know how it may be useful.
  */
-
-#ifndef ECOSNAIL_CONTAINERS_TYPE_SET_HPP
-#define ECOSNAIL_CONTAINERS_TYPE_SET_HPP
 
 namespace ecosnail {
 namespace tail {
@@ -52,7 +53,7 @@ public:
  */
 template <class First, class... Others>
 class TypeSet<First, Others...> {
-    static_assert(internal::unique<First, Others...>(),
+    static_assert(internal::Unique<First, Others...>(),
         "TypeSet: all types must be different");
 
 public:
@@ -64,7 +65,7 @@ public:
     template <class T>
     static constexpr bool has()
     {
-        return std::is_same<T, First>::value || Tail::has<T>();
+        return std::is_same<T, First>::value || Tail::template has<T>();
     }
 
     template <class OtherTypeSet>
@@ -78,9 +79,8 @@ public:
 template <class TypeSet1, class TypeSet2>
 constexpr bool typeSetsEqual()
 {
-    return TypeSet1::contains<TypeSet2>() && TypeSet2::contains<TypeSet1>();
+    return TypeSet1::template contains<TypeSet2>() &&
+        TypeSet2::template contains<TypeSet1>();
 }
 
 }} // namespace ecosnail::tail
-
-#endif

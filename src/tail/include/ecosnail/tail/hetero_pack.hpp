@@ -1,68 +1,11 @@
-#ifndef ECOSNAIL_CONTAINERS_HETERO_PACK_HPP
-#define ECOSNAIL_CONTAINERS_HETERO_PACK_HPP
+#pragma once
 
-#include <type_traits>
+#include <ecosnail/tail/internal/utils.hpp>
+
 #include <utility>
 
 namespace ecosnail {
 namespace tail {
-
-namespace internal {
-
-/**
- * Check if the first type in a type list is not contained in the rest of the
- * list.
- */
-
-template <class T1, class T2, class... Others>
-constexpr bool firstIsUnique()
-{
-    return !std::is_same<T1, T2>::value && firstIsUnique<T1, Others...>();
-}
-
-template <class T>
-constexpr bool firstIsUnique()
-{
-    return true;
-}
-
-/**
- * Check if a type list contains no identical types.
- */
-
-template <class T1, class T2, class... Others>
-constexpr bool unique()
-{
-    return firstIsUnique<T1, T2, Others...>() && unique<T2, Others...>();
-}
-
-template <class T>
-constexpr bool unique()
-{
-    return true;
-}
-
-template <class T>
-constexpr T argOfType()
-{
-    static_assert(false, "argOfType: requested type not found");
-}
-
-template <class T, class First, class... Others>
-constexpr std::enable_if_t<std::is_same<T, First>::value, T>
-argOfType(First first, Others... others)
-{
-    return first;
-}
-
-template <class T, class First, class... Others>
-constexpr std::enable_if_t<!std::is_same<T, First>::value, T>
-argOfType(First first, Others... others)
-{
-    return argOfType<T, Others...>(others...);
-}
-
-} // namespace internal
 
 template <class... Types>
 class HeteroPack {
@@ -76,14 +19,14 @@ public:
     template <class T>
     const T& at() const
     {
-        static_assert(false,
+        static_assert(internal::DependentFalse<T>(),
             "ecosnail::tail::HeteroPack: requested type is not present");
     }
 
     template <class T>
     T& at()
     {
-        static_assert(false,
+        static_assert(internal::DependentFalse<T>(),
             "ecosnail::tail::HeteroPack: requested type is not present");
     }
 
@@ -120,7 +63,7 @@ public:
 
 template <class First, class... Others>
 class HeteroPack<First, Others...> : HeteroPack<Others...> {
-    static_assert(internal::unique<First, Others...>(),
+    static_assert(internal::Unique<First, Others...>(),
         "ecosnail::tail::HeteroPack: "
         "cannot contain values of identical types");
 
@@ -134,37 +77,31 @@ public:
     template <class T>
     const T& at() const
     {
-        return HeteroPack<Others...>::at<T>();
-    }
-
-    template <>
-    const First& at<First>() const
-    {
-        return _t;
+        if constexpr (std::is_same<T, First>()) {
+            return _t;
+        } else {
+            return HeteroPack<Others...>::template at<T>();
+        }
     }
 
     template <class T>
     T& at()
     {
-        return HeteroPack<Others...>::at<T>();
-    }
-
-    template <>
-    First& at<First>()
-    {
-        return _t;
+        if constexpr (std::is_same<T, First>()) {
+            return _t;
+        } else {
+            return HeteroPack<Others...>::template at<T>();
+        }
     }
 
     template <class T>
     bool has(const T& value) const
     {
-        return HeteroPack<Others...>::has<T>(value);
-    }
-
-    template <>
-    bool has<First>(const First& value) const
-    {
-        return value == _t;
+        if constexpr (std::is_same<T, First>()) {
+            return value == _t;
+        } else {
+            return HeteroPack<Others...>::template has<T>(value);
+        }
     }
 
     template <class Other>
@@ -196,5 +133,3 @@ private:
 };
 
 }} // namespace ecosnail::tail
-
-#endif
