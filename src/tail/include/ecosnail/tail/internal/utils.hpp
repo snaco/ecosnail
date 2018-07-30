@@ -42,5 +42,40 @@ argOfType(First first, Others... others)
     return argOfType<T, Others...>(others...);
 }
 
+/**
+ * Arithmetic operators result type
+ */
+
+template <class Left, class Right>
+struct SumTypeHelper {
+    using Type = decltype(std::declval<Left>() + std::declval<Right>());
+};
+
+template <class Left, class Right>
+using SumType = typename SumTypeHelper<Left, Right>::Type;
+
+template <class Left, class Right>
+struct DiffTypeHelper {
+    using Type = decltype(std::declval<Left>() - std::declval<Right>());
+};
+
+template <class Left, class Right>
+using DiffType = typename DiffTypeHelper<Left, Right>::Type;
+
+template <class Left, class Right>
+struct MulTypeHelper {
+    using Type = decltype(std::declval<Left>() * std::declval<Right>());
+};
+
+template <class Left, class Right>
+using MulType = typename MulTypeHelper<Left, Right>::Type;
+
+template <class Left, class Right>
+struct DivTypeHelper {
+    using Type = decltype(std::declval<Left>() / std::declval<Right>());
+};
+
+template <class Left, class Right>
+using DivType = typename DivTypeHelper<Left, Right>::Type;
 
 }}} // namespace ecosnail::tail::internal

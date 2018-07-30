@@ -1,2 +1,2 @@
-add_executable (tail_test tail_test.cpp)
-target_link_libraries (tail_test tail)
+add_executable (vector_test vector_test.cpp)
+target_link_libraries (vector_test tail)
