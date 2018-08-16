@@ -2,6 +2,8 @@
 
 #include <ecosnail/tail/internal/utils.hpp>
 
+#include <ecosnail/mef.hpp>
+
 /**
  * TypeSet.
  * I seriously don't know how it may be useful.
@@ -53,12 +55,12 @@ public:
  */
 template <class First, class... Others>
 class TypeSet<First, Others...> {
-    static_assert(internal::Unique<First, Others...>(),
+    static_assert(mef::Unique<First, Others...>(),
         "TypeSet: all types must be different");
 
 public:
-    typedef First Head;
-    typedef TypeSet<Others...> Tail;
+    using Head = First;
+    using Tail = TypeSet<Others...>;
 
     static constexpr bool empty() { return false; }
 
@@ -72,15 +74,13 @@ public:
     static constexpr bool contains()
     {
         return OtherTypeSet::empty() ||
-            has<OtherTypeSet::Head>() && contains<OtherTypeSet::Tail>();
+            has<typename OtherTypeSet::Head>() && contains<typename OtherTypeSet::Tail>();
     }
 };
 
-template <class TypeSet1, class TypeSet2>
-constexpr bool typeSetsEqual()
-{
-    return TypeSet1::template contains<TypeSet2>() &&
-        TypeSet2::template contains<TypeSet1>();
-}
+template <class LeftTypeSet, class RightTypeSet>
+struct TypeSetsEqual : std::bool_constant<
+    LeftTypeSet::template contains<RightTypeSet>() &&
+    RightTypeSet::template contains<LeftTypeSet>()> {};
 
 }} // namespace ecosnail::tail

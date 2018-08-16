@@ -2,6 +2,8 @@
 
 #include <ecosnail/tail/internal/utils.hpp>
 
+#include <ecosnail/mef.hpp>
+
 #include <utility>
 
 namespace ecosnail {
@@ -63,7 +65,7 @@ public:
 
 template <class First, class... Others>
 class HeteroPack<First, Others...> : HeteroPack<Others...> {
-    static_assert(internal::Unique<First, Others...>(),
+    static_assert(mef::Unique<First, Others...>(),
         "ecosnail::tail::HeteroPack: "
         "cannot contain values of identical types");
 
