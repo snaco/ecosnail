@@ -23,4 +23,7 @@ int main()
     std::cout << "x = " << x << std::endl;
 
     auto s = Dimented<int, Seconds<1>>(5);
+
+    auto p1 = Dimented<int, Meters<1>, Seconds<1>>(1);
+    Dimented<int, Seconds<1>, Meters<1>> p2 = p1;
 }

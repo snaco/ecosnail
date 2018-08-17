@@ -24,7 +24,7 @@ macro (ecosnail_project)
         endif ()
     endif ()
 
-    if (IS_DIRECTORY tests)
+    if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests")
         add_subdirectory (tests)
     endif ()
 
