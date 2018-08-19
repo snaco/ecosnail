@@ -79,8 +79,16 @@ public:
 };
 
 template <class LeftTypeSet, class RightTypeSet>
-struct TypeSetsEqual : std::bool_constant<
+struct _TypeSetsEqual : std::bool_constant<
     LeftTypeSet::template contains<RightTypeSet>() &&
     RightTypeSet::template contains<LeftTypeSet>()> {};
+
+template <class LeftTypeSet, class RightTypeSet>
+inline constexpr bool TypeSetsEqual =
+    _TypeSetsEqual<LeftTypeSet, RightTypeSet>::value;
+
+template <class LeftTypeSet, class RightTypeSet>
+using EnableIfTypeSetsEqual =
+    std::enable_if_t<TypeSetsEqual<LeftTypeSet, RightTypeSet>>;
 
 }} // namespace ecosnail::tail
