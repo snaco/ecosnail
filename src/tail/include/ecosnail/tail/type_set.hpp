@@ -1,8 +1,7 @@
 #pragma once
 
 #include <ecosnail/tail/internal/utils.hpp>
-
-#include <ecosnail/mef.hpp>
+#include <ecosnail/tail/common.hpp>
 
 /**
  * TypeSet.
@@ -55,7 +54,7 @@ public:
  */
 template <class First, class... Others>
 class TypeSet<First, Others...> {
-    static_assert(mef::Unique<First, Others...>(),
+    static_assert(Unique<First, Others...>(),
         "TypeSet: all types must be different");
 
 public:
@@ -78,17 +77,22 @@ public:
     }
 };
 
-template <class LeftTypeSet, class RightTypeSet>
-struct _TypeSetsEqual : std::bool_constant<
-    LeftTypeSet::template contains<RightTypeSet>() &&
-    RightTypeSet::template contains<LeftTypeSet>()> {};
+/**
+ * Has for TypeSet
+ */
 
-template <class LeftTypeSet, class RightTypeSet>
-inline constexpr bool TypeSetsEqual =
-    _TypeSetsEqual<LeftTypeSet, RightTypeSet>::value;
+template <class... TypeSetTypes, class Type>
+struct Has<TypeSet<TypeSetTypes...>, Type> :
+    std::disjunction<std::is_same<Type, TypeSetTypes>...> {};
 
-template <class LeftTypeSet, class RightTypeSet>
-using EnableIfTypeSetsEqual =
-    std::enable_if_t<TypeSetsEqual<LeftTypeSet, RightTypeSet>>;
+/**
+ * Equal for TypeSet
+ */
+
+template <class... LeftTypes, class... RightTypes>
+struct Equal<TypeSet<LeftTypes...>, TypeSet<RightTypes...>> :
+    std::conjunction<
+        Has<TypeSet<LeftTypes...>, RightTypes>...,
+        Has<TypeSet<RightTypes...>, LeftTypes>...> {};
 
 }} // namespace ecosnail::tail

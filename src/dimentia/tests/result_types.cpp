@@ -67,7 +67,6 @@ int main()
     static_assert(IsInvalid<Diff, A, D>());
 
     static_assert(ResultIs<Mul, A, B, AB_Mul>());
-    // TODO: fix
-    //static_assert(ResultIs<Mul, A, C, AC_Mul>());
+    static_assert(ResultIs<Mul, A, C, AC_Mul>());
     static_assert(ResultIs<Mul, A, D, AD_Mul>());
 }

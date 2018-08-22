@@ -15,6 +15,7 @@ int main()
 {
     Dimented<int, Dim1<1>> x(10);
     Dimented<int, Dim2<2>> y(10);
+
     auto z = x * y;
 
     static_assert(std::is_same_v<decltype(x * y), Dimented<int, Dim1<1>, Dim2<2>>>);
