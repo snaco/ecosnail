@@ -46,12 +46,12 @@ public:
      * Construction
      */
 
-    Dimented()
+    constexpr Dimented()
         : _value()
     { }
 
-    explicit Dimented(Type value)
-        : _value(std::move(value))
+    explicit constexpr Dimented(const Type& value)
+        : _value(value)
     { }
 
     /**
@@ -261,6 +261,12 @@ struct _DivisionType<
  * Arithmetic operators
  */
 
+template <class Dimented, class = internal::EnableIfDimented<Dimented>>
+Dimented operator-(const Dimented& dimented)
+{
+    return Dimented{-dimented.value()};
+}
+
 // NOTE: It may make sense to accept the first argument in operator+ by value,
 // whenever a call to operator+= is possible. The same applies to other
 // arithmetic operators.
@@ -290,11 +296,83 @@ auto operator*(const Left& left, const Right& right)
 }
 
 template <
+    class Type, class... Dimensions, class Scalar,
+    class = std::enable_if_t<std::is_convertible_v<Scalar, Type>>>
+auto operator*(
+    const Dimented<Type, Dimensions...>& dimented, const Scalar& scalar)
+{
+    return Dimented<tail::ProductType<Type, Scalar>, Dimensions...>(
+        dimented.value() * scalar);
+}
+
+template <
+    class Type, class... Dimensions, class Scalar,
+    class = std::enable_if_t<std::is_convertible_v<Scalar, Type>>>
+auto operator*(
+    const Scalar& scalar, const Dimented<Type, Dimensions...>& dimented)
+{
+    return Dimented<tail::ProductType<Type, Scalar>, Dimensions...>(
+        scalar * dimented.value());
+}
+
+template <
     class Left, class Right,
     class = internal::EnableIfDimented<Left, Right>>
 auto operator/(const Left& left, const Right& right)
 {
     return internal::DivisionType<Left, Right>(left.value() / right.value());
+}
+
+/**
+ * Comparison operators
+ */
+
+template <
+    class Left, class Right,
+    class = internal::EnableIfSameDimensions<Left, Right>>
+bool operator==(const Left& left, const Right& right)
+{
+    return left.value() == right.value();
+}
+
+template <
+    class Left, class Right,
+    class = internal::EnableIfSameDimensions<Left, Right>>
+bool operator!=(const Left& left, const Right& right)
+{
+    return left.value() != right.value();
+}
+
+template <
+    class Left, class Right,
+    class = internal::EnableIfSameDimensions<Left, Right>>
+bool operator<(const Left& left, const Right& right)
+{
+    return left.value() < right.value();
+}
+
+template <
+    class Left, class Right,
+    class = internal::EnableIfSameDimensions<Left, Right>>
+bool operator>(const Left& left, const Right& right)
+{
+    return left.value() > right.value();
+}
+
+template <
+    class Left, class Right,
+    class = internal::EnableIfSameDimensions<Left, Right>>
+bool operator<=(const Left& left, const Right& right)
+{
+    return left.value() <= right.value();
+}
+
+template <
+    class Left, class Right,
+    class = internal::EnableIfSameDimensions<Left, Right>>
+bool operator>=(const Left& left, const Right& right)
+{
+    return left.value() >= right.value();
 }
 
 /**

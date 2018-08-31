@@ -5,5 +5,6 @@ ecosnail_project (
         tail
 
     EXAMPLES
+        running_square
         simple
 )
