@@ -1,7 +1,6 @@
-ecosnail_test(
-    SOURCES
-        container.cpp
-        main.cpp
-        subscriber.cpp
-        subscription.cpp
+ecosnail_test (test
+    container.cpp
+    main.cpp
+    subscriber.cpp
+    subscription.cpp
 )

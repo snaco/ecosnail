@@ -1,1 +1,1 @@
-ecosnail_test (fuzz_test.cpp)
+ecosnail_test (test.cpp)
