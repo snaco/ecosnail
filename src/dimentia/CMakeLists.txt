@@ -1,6 +1,4 @@
 ecosnail_project (
-    NAME dimentia
-
     DEPENDS
         tail
 
