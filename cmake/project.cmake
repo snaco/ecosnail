@@ -23,7 +23,7 @@ macro (ecosnail_project)
 
     if (PROJECT_SOURCES)
         add_library (${PROJECT_NAME} ${PROJECT_SOURCES})
-        target_include_directories (${PROJECT_NAME} PRIVATE include)
+        target_include_directories (${PROJECT_NAME} PUBLIC include)
         if (PROJECT_DEPENDS)
             target_link_libraries (${PROJECT_NAME} PRIVATE ${PROJECT_DEPENDS})
         endif ()
