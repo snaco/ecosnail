@@ -5,4 +5,6 @@ ecosnail_project (
     EXAMPLES
         running_square
         simple
+
+    TESTS
 )

@@ -8,6 +8,7 @@ ecosnail_projects (
     fuzz
     tail
     tempo
+    thing
     tops
 )
 

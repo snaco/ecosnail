@@ -5,7 +5,7 @@ macro (ecosnail_projects)
 endmacro ()
 
 macro (ecosnail_project)
-    set (options "")
+    set (options TESTS)
     set (oneValueArgs "")
     set (multiValueArgs SOURCES DEPENDS EXAMPLES)
     cmake_parse_arguments (
@@ -35,7 +35,7 @@ macro (ecosnail_project)
         endif ()
     endif ()
 
-    if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+    if (PROJECT_TESTS)
         set (${project_key}_HAS_TESTS 1 PARENT_SCOPE)
         add_subdirectory (tests)
     else ()

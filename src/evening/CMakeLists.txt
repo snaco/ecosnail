@@ -1,1 +1,3 @@
-ecosnail_project()
+ecosnail_project(
+    TESTS
+)
