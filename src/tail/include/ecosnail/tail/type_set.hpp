@@ -1,7 +1,8 @@
 #pragma once
 
-#include <ecosnail/tail/internal/utils.hpp>
 #include <ecosnail/tail/common.hpp>
+#include <ecosnail/tail/internal/utils.hpp>
+#include <ecosnail/tail/types.hpp>
 
 /**
  * TypeSet.
@@ -72,8 +73,9 @@ public:
     template <class OtherTypeSet>
     static constexpr bool contains()
     {
-        return OtherTypeSet::empty() ||
-            has<typename OtherTypeSet::Head>() && contains<typename OtherTypeSet::Tail>();
+        return OtherTypeSet::empty() || (
+            has<typename OtherTypeSet::Head>() &&
+            contains<typename OtherTypeSet::Tail>());
     }
 };
 

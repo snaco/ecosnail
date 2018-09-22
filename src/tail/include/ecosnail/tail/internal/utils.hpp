@@ -16,14 +16,14 @@ constexpr T argOfType()
 
 template <class T, class First, class... Others>
 constexpr std::enable_if_t<std::is_same<T, First>::value, T>
-argOfType(First first, Others... others)
+argOfType(First first, Others...)
 {
     return first;
 }
 
 template <class T, class First, class... Others>
 constexpr std::enable_if_t<!std::is_same<T, First>::value, T>
-argOfType(First first, Others... others)
+argOfType(First, Others... others)
 {
     return argOfType<T, Others...>(others...);
 }

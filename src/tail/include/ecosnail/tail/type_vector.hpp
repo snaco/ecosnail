@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ecosnail/tail/common.hpp>
+
 #include <type_traits>
 
 namespace ecosnail::tail {

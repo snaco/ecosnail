@@ -12,10 +12,7 @@ template <class... Types>
 class HeteroPack {
 public:
     template <class... Args>
-    HeteroPack(Args&&... args)
-    {
-
-    }
+    HeteroPack(Args&&...) { }
 
     template <class T>
     const T& at() const
@@ -32,13 +29,13 @@ public:
     }
 
     template <class T>
-    bool has(T value) const
+    bool has(T) const
     {
         return false;
     }
 
     template <class Other>
-    bool containedIn(const Other& other) const
+    bool containedIn(const Other&) const
     {
         return true;
     }
