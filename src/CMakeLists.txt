@@ -13,3 +13,4 @@ ecosnail_projects (
 )
 
 print_summary ()
+write_depends_file ()

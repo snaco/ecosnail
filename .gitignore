@@ -1,7 +1,5 @@
-.vs/
-bin/
-build/
-/sandbox/
-*.VC.db
-*.VC.opendb
 *.swp
+/.depends.json
+/bin/
+/build/
+/sandbox/
