@@ -2,10 +2,14 @@
 
 #include <ecosnail/thing/entity.hpp>
 #include <ecosnail/thing/entity_pool.hpp>
-#include <ecosnail/thing/range.hpp>
+
+#include <ecosnail/tail.hpp>
 
 #include <any>
+#include <cassert>
 #include <map>
+#include <memory>
+#include <optional>
 #include <typeindex>
 #include <vector>
 
@@ -16,41 +20,85 @@ public:
     template <class Component>
     const Component& component(Entity entity) const
     {
-        return componentMap<Component>().at(entity);
+        assert(_components.count(typeid(Component)));
+        const auto& componentMap =
+            std::any_cast<const std::map<Entity, Component>&>(
+                _components.at(typeid(Component)));
+
+        assert(componentMap.count(entity));
+        return componentMap.at(entity);
     }
 
     template <class Component>
     Component& component(Entity entity)
     {
-        return componentMap<Component>()[entity];
+        assert(_components.count(typeid(Component)));
+        auto& componentMap =
+            std::any_cast<std::map<Entity, Component>&>(
+                _components.at(typeid(Component)));
+
+        assert(componentMap.count(entity));
+        return componentMap.at(entity);
     }
 
     template <class Component>
-    const auto componentsOfType()
+    auto componentsOfType() const
     {
-        return Range<Component, Get::Components>(componentMap<Component>());
-    }
+        using ComponentMap = std::map<Entity, Component>;
 
-    template <class Component>
-    const auto entities()
-    {
-        return Range<Component, Get::Entities>(componentMap<Component>());
-    }
-
-    template <class Component>
-    void add(Entity entity)
-    {
-        // TODO: check that entity does not yet have this component
-        auto anyComponentMap = _components.find(typeid(Component));
-        if (anyComponentMap != _components.end()) {
-            auto& componentMap =
-                std::any_cast<ComponentMap<Component>&>(anyComponentMap->second);
-            componentMap[entity] = Component();
+        auto it = _components.find(typeid(Component));
+        if (it == _components.end()) {
+            return tail::valueRange<const ComponentMap>();
         }
 
-        ComponentMap<Component> componentMap;
-        componentMap[entity] = Component();
-        _components[typeid(Component)] = std::any(std::move(componentMap));
+        const auto& componentMap =
+            std::any_cast<const ComponentMap&>(it->second);
+        return tail::valueRange(componentMap);
+    }
+
+    template <class Component>
+    auto componentsOfType()
+    {
+        using MapRef = std::map<Entity, Component>&;
+
+        auto it = _components.find(typeid(Component));
+        if (it == _components.end()) {
+            return tail::valueRange<MapRef>();
+        }
+
+        auto& componentMap = std::any_cast<MapRef>(it->second);
+        return tail::valueRange(componentMap);
+    }
+
+    template <class Component>
+    auto entities() const
+    {
+        using MapRef = const std::map<Entity, Component>&;
+
+        auto it = _components.find(typeid(Component));
+        if (it == _components.end()) {
+            return tail::keyRange<MapRef>();
+        }
+
+        const auto& componentMap =
+            std::any_cast<const std::map<Entity, Component>&>(it->second);
+        return tail::keyRange(componentMap);
+    }
+
+    template <class Component>
+    auto& add(Entity entity)
+    {
+        using ComponentMap = std::map<Entity, Component>;
+
+        std::type_index typeIndex(typeid(Component));
+        auto it = _components.find(typeIndex);
+        if (it == _components.end()) {
+            it = _components.insert({typeIndex, ComponentMap()}).first;
+        }
+
+        auto& componentMap = std::any_cast<ComponentMap&>(it->second);
+        assert(!componentMap.count(entity));
+        return componentMap.insert({entity, Component()}).first->second;
     }
 
     Entity createEntity()
@@ -64,13 +112,6 @@ public:
     }
 
 private:
-    template <class Component>
-    auto& componentMap()
-    {
-        return std::any_cast<ComponentMap<Component>&>(
-            _components[typeid(Component)]);
-    }
-
     EntityPool _entityPool;
     std::map<std::type_index, std::any> _components;
 };

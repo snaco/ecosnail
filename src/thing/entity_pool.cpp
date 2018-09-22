@@ -19,7 +19,7 @@ Entity EntityPool::createEntity()
 void EntityPool::killEntity(Entity entity)
 {
     // WARNING: slow assertion
-    assert(_nextEntity > entity &&
+    assert(Entity{_nextEntity} > entity &&
         std::find(
             _freeEntities.begin(),
             _freeEntities.end(),
