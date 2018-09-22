@@ -9,6 +9,10 @@ FLAGS = [
     '-Wextra',
     '-x', 'c++',
     '-std=c++17',
+
+    '-isystem', '/usr/include/',
+    '-isystem', '/usr/include/c++/8.2.1',
+    '-isystem', '/usr/include/c++/8.2.1/x86_64-pc-linux-gnu',
 ]
 
 with open(DEPENDS_PATH) as f:
