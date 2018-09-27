@@ -42,7 +42,7 @@ public:
     }
 
     template <class Component>
-    auto componentsOfType() const
+    auto components() const
     {
         using ComponentMap = std::map<Entity, Component>;
 
@@ -57,7 +57,7 @@ public:
     }
 
     template <class Component>
-    auto componentsOfType()
+    auto components()
     {
         using MapRef = std::map<Entity, Component>&;
 

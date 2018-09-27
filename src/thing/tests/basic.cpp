@@ -36,10 +36,10 @@ TEST_CASE("Simple", "[simple]")
     manager.add<C2>(e12);
     manager.component<C2>(e12).id = 4;
 
-    for (const C1& component : manager.componentsOfType<C1>()) {
+    for (const C1& component : manager.components<C1>()) {
         REQUIRE(component.id % 2 == 1);
     }
-    for (const C2& component : manager.componentsOfType<C2>()) {
+    for (const C2& component : manager.components<C2>()) {
         REQUIRE(component.id % 2 == 0);
     }
 
@@ -107,7 +107,7 @@ TEST_CASE("Get component pack", "[component]")
 
     auto sum = [] (const EntityManager& manager) {
         int sum = 0;
-        for (const auto& i : manager.componentsOfType<int>()) {
+        for (const auto& i : manager.components<int>()) {
             sum += i;
         }
         return sum;
@@ -117,7 +117,7 @@ TEST_CASE("Get component pack", "[component]")
 
     auto concat = [] (const EntityManager& manager) {
         std::string concat;
-        for (const auto& s : manager.componentsOfType<std::string>()) {
+        for (const auto& s : manager.components<std::string>()) {
             concat += s;
         }
         return concat;
@@ -131,7 +131,7 @@ TEST_CASE("No components", "[component]")
     const EntityManager manager;
 
     int sum = 0;
-    for (int value : manager.componentsOfType<int>()) {
+    for (int value : manager.components<int>()) {
         sum += value;
     }
     REQUIRE(sum == 0);
