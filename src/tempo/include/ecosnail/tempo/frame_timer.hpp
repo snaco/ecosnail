@@ -2,13 +2,12 @@
 
 #include <chrono>
 
-namespace ecosnail {
-namespace tempo {
+namespace ecosnail::tempo {
 
 class FrameTimer {
 public:
     FrameTimer(int fps);
-    const double delta() const;
+    double delta() const;
     int framesPassed();
 
 private:
@@ -20,4 +19,4 @@ private:
     Clock::duration _frameDuration;
 };
 
-}} // namespace ecosnail::tempo
+} // namespace ecosnail::tempo

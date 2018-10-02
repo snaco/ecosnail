@@ -1,7 +1,6 @@
 #include <ecosnail/tempo/frame_timer.hpp>
 
-namespace ecosnail {
-namespace tempo {
+namespace ecosnail::tempo {
 
 FrameTimer::FrameTimer(int fps)
     : _lastFrame(0)
@@ -11,7 +10,7 @@ FrameTimer::FrameTimer(int fps)
         std::chrono::duration<double>(_delta)))
 { }
 
-const double FrameTimer::delta() const
+double FrameTimer::delta() const
 {
     return _delta;
 }
@@ -25,4 +24,4 @@ int FrameTimer::framesPassed()
     return static_cast<int>(frameDiff);
 }
 
-}} // namespace ecosnail::tempo
+} // namespace ecosnail::tempo
