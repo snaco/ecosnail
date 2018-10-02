@@ -10,6 +10,7 @@
 #include <map>
 #include <memory>
 #include <optional>
+#include <type_traits>
 #include <typeindex>
 #include <vector>
 
@@ -88,6 +89,15 @@ public:
     template <class Component>
     auto& add(Entity entity)
     {
+        static_assert(
+            std::is_default_constructible<Component>(),
+            "Component is not default-constructible");
+        return add<Component>(entity, Component{});
+    }
+
+    template <class Component>
+    auto& add(Entity entity, Component&& component)
+    {
         using ComponentMap = std::map<Entity, Component>;
 
         std::type_index typeIndex(typeid(Component));
@@ -98,7 +108,8 @@ public:
 
         auto& componentMap = std::any_cast<ComponentMap&>(it->second);
         assert(!componentMap.count(entity));
-        return componentMap.insert({entity, Component()}).first->second;
+        return componentMap.insert(
+            {entity, std::forward<Component>(component)}).first->second;
     }
 
     Entity createEntity()
