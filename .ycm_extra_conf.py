@@ -31,6 +31,9 @@ def get_project(file_path):
 
 
 def Settings(**kwargs):
+    if kwargs['language'] == 'python':
+        return {}
+
     file_path = kwargs['filename']
     project = get_project(file_path)
     depends = DEPENDS[project]

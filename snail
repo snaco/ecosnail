@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+import re
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+def error(message):
+    sys.stderr.write("{}\n".format(message))
+    sys.exit(1)
+
+def command_create(args):
+    if not re.match(r'^[a-z]+$', args.project):
+        sys.stderr.write("invalid project name: {}\n".format(args.project))
+        return 1
+
+    project_path = os.path.join(ROOT_DIR, "src", args.project)
+    if os.path.exists(project_path):
+        error("project \"{}\" already exists".format(args.project))
+
+    top_include_dir = os.path.join(project_path, "include", "ecosnail")
+    os.makedirs(top_include_dir)
+
+    top_include_file = os.path.join(
+        top_include_dir, "{}.hpp".format(args.project))
+    with open(top_include_file, "w") as f:
+        f.write("#pragma once\n")
+
+    top_cmake_file = os.path.join(project_path, "CMakeLists.txt")
+    with open(top_cmake_file, "w") as f:
+        f.write("ecosnail_project()\n")
+
+    src_cmake_file = os.path.join(ROOT_DIR, "src", "CMakeLists.txt")
+
+
+def command_check(args):
+    pass
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(title="title", description="description", help="help")
+
+    create_parser = subparsers.add_parser("create",
+        help="create a new ecosnail project")
+    create_parser.add_argument("project", metavar="PROJECT",
+        help="name of the project to set up")
+    create_parser.set_defaults(func=command_create)
+
+    check_parser = subparsers.add_parser("check",
+        help="check current state of the development tree")
+    check_parser.set_defaults(func=command_check)
+
+    args = parser.parse_args()
+
+
+
+if __name__ == "__main__":
+    main()
