@@ -1,8 +1,6 @@
 #pragma once
 
-#include <ecosnail/argo/data.hpp>
-#include <ecosnail/argo/flag.hpp>
-#include <ecosnail/argo/option.hpp>
+#include <ecosnail/argo/argument.hpp>
 
 #include <utility>
 #include <vector>
@@ -13,83 +11,79 @@
 
 namespace ecosnail::argo {
 
-// TODO: Check flag correctness
+// TODO: Check flag correctness (e.g. flags start with "--")?
 
 class Parser {
 public:
-    template <
-        class... Flags,
-        class = std::enable_if_t<
-            std::conjunction_v<
-                std::is_convertible<Flags, std::string_view>...>>>
-    Flag flag(Flags&&... flags)
+    // TODO: all flags can be converted to strings?
+    // TODO: at least one flag present?
+    template <class Type, class... Flags>
+    Argument<Type> option(Flags&&... flags)
     {
-        auto data = std::make_shared<FlagData>();
-        (addMapForLastData(flags), ...);
+        // TODO: different mappings do not overlap?
+        ((_mapping[flags] = _arguments.size()), ...);
+        auto data = std::make_shared<TypedArgumentData<Type>>();
+        _arguments.push_back(data);
+        return Argument<Type>(data);
     }
 
-    template <
-        class Type,
-        class... Flags,
-        class = std::enable_if_t<
-            std::conjunction_v<
-                std::is_convertible<Flags, std::string_view>...>>>
-    Option<Type> option(Flags&&... flags)
-    {
-        auto data = std::make_shared<OptionData<Type>>();
-        (addMapForLastData(flags), ...);
-    }
-
-    void parse(const std::vector<std::string>& args)
+    template <class Args = std::initializer_list<std::string_view>>
+    void parse(const Args& args)
     {
         for (auto arg = args.begin(); arg != args.end(); ++arg) {
-            if (auto it = _flags.find(*arg); it != _flags.end()) {
-                auto& flagData = it->second;
+            if (auto it = _mapping.find(*arg); it != _mapping.end()) {
+                auto& data = _arguments.at(it->second);
 
-                check(flagData->multi || flagData->timesUsed == 0,
-                    "a non-multi flag used multiple times: " + *arg);
-                flagData->timesUsed++;
-            }
-            if (auto it = _options.find(*arg); it != _options.end()) {
-                auto &optionData = it->second;
+                check(data->multi || data->timesUsed == 0,
+                    "a non-multi argument used multiple times");
+                data->timesUsed++;
 
-                check(optionData->multi || optionData->values.empty(),
-                    "a non-multi option used multiple times: " + *arg);
-                ++arg;
-                check(arg != args.end(),
-                    "argument non provided for option: " + *arg);
-                optionData->values.push_back(*arg);
+                if (data->takesArgument) {
+                    ++arg;
+                    check(arg != args.end(), "no value for argument");
+                    data->provide(*arg);
+                }
             }
         }
 
-        for (const auto& [flag, optionData] : _options) {
-            check(!optionData->required || !optionData->values.empty(),
-                "required option not provided: " + flag);
+        for (const auto& data : _arguments) {
+            check(!data->required || data->timesUsed > 0,
+                "required argument unused");
         }
+    }
+
+    void parse(int argc, char* argv[])
+    {
+        std::vector<std::string_view> args;
+        for (int i = 1; i < argc; i++) {
+            args.push_back(argv[i]);
+        }
+        parse(args);
     }
 
 private:
-    void addFlagData(
-        std::string_view flag, const std::shared_ptr<FlagData>& data)
-    {
-        if (_flags.count(flag) || _options.count(flag)) {
-            throw Exception("Flag already used: "s + flag);
-        }
-        _flags[flag] = data;
-    }
-
-    void addOptionData(
-        std::string_view flag, const std::shared_ptr<BaseOptionData>& data)
-    {
-        if (_flags.count(flag) || _options.count(flag)) {
-            throw Exception("Flag already used: "s + flag);
-        }
-        _options[flag] = data;
-    }
-
-    std::map<std::string, std::shared_ptr<FlagData>> _flags;
-    std::map<std::string, std::shared_ptr<BaseOptionData>> _options;
+    std::vector<std::shared_ptr<ArgumentData>> _arguments;
+    std::map<std::string, size_t, std::less<>> _mapping;
     std::vector<std::string> _freeArgs;
 };
+
+Parser globalParser;
+
+template <class Type, class... Flags>
+Argument<Type> option(Flags&&... flags)
+{
+    return globalParser.option<Type>(std::forward<Flags>(flags)...);
+}
+
+template <class Args = std::initializer_list<std::string_view>>
+void parse(const Args& args)
+{
+    globalParser.parse(args);
+}
+
+void parse(int argc, char* argv[])
+{
+    globalParser.parse(argc, argv);
+}
 
 } // namespace ecosnail::argo

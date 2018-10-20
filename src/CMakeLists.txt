@@ -1,6 +1,7 @@
 include (project)
 
 ecosnail_projects (
+    argo
     blabla
     config
     dimentia

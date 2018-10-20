@@ -1,22 +1,25 @@
 #include <ecosnail/argo.hpp>
-#include <ecosnail/tail.hpp>
 
-#include <optional>
+#include <iostream>
+#include <string>
 
 namespace argo = ecosnail::argo;
 
 int main(int argc, char* argv[])
 {
-    argo::Parser parser;
-    auto message = parser.option<std::string>("-m", "--message");
-    auto times = parser.option<int>("-t", "--times")
+    auto message = argo::option<std::string>("-m", "--message");
+    auto times = argo::option<int>("-t", "--times")
         .required()
         .help("number of times to print the message");
-    auto makeOffset = parser.flat("--offset")
-        .help("make fancy offset");
-    auto decoration = parser.option<char>("-d", "--decoration")
-        .multi()
+    auto offset = argo::option<int>("--offset")
+        .help("size of fancy offset");
+    auto decoration = argo::option<std::string>("-d", "--decoration")
         .help("characters to decorate text with");
-    parser.parse(argc, argv);
+    argo::parse(argc, argv);
+
+    for (int i = 0; i < times; i++) {
+        std::cout << std::string(offset, ' ') << decoration << message <<
+            std::endl;
+    }
 }
 
