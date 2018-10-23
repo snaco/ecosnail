@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 #include <sstream>
+#include <optional>
 
 namespace ecosnail::argo {
 
@@ -20,10 +21,12 @@ T cast(std::string_view text)
 }
 
 struct ArgumentData {
+    // TODO: implement proper constructor? check state before virtual functions?
     virtual void provide(std::string_view value) = 0;
 
+    std::vector<std::string> flags;
     bool multi = false;
-    bool required = true;
+    bool required = false;
     bool takesArgument = true;
     size_t timesUsed = 0;
     std::string helpText;
@@ -37,6 +40,7 @@ struct TypedArgumentData : ArgumentData {
     }
 
     std::vector<T> values;
+    std::optional<T> defaultValue;
 };
 
 template <class T>
@@ -75,6 +79,8 @@ private:
     typename std::vector<T>::const_iterator _dataIterator;
 };
 
+// TODO: more informative error messages
+
 template <class T>
 class Argument {
     using Values = std::vector<T>;
@@ -84,12 +90,17 @@ public:
         : _data(std::move(data))
     { }
 
-    // TODO: const& ?
-    operator T()
+    operator T() const
     {
         check(!_data->multi, "cannot cast multi argument to a single value");
-        check(!_data->values.empty(), "cannot cast, no values provided");
-        return _data->values.front();
+        // TODO: check default-constructible somewhere?
+        if (!_data->values.empty()) {
+            return _data->values.front();
+        }
+        if (_data->defaultValue) {
+            return *_data->defaultValue;
+        }
+        return T{};
     }
 
     auto begin() const
@@ -112,7 +123,16 @@ public:
 
     Argument required()
     {
+        // TODO: check default value not present?
         _data->required = true;
+        return *this;
+    }
+
+    // TODO: check default-constructible or required?
+
+    Argument defaultValue(T value)
+    {
+        _data->defaultValue = value;
         return *this;
     }
 
@@ -131,13 +151,17 @@ public:
     friend std::ostream& operator<<(
         std::ostream& output, const Argument& argument)
     {
-        const auto& values = argument._data->values;
-        if (auto it = values.begin(); it != values.end()) {
-            output << *it++;
-            for (; it != values.end(); ++it) {
-                output << ", " << *it;
+        if (argument._data->multi) {
+            if (auto it = argument.begin(); it != argument.end()) {
+                output << *it++;
+                for (; it != argument.end(); ++it) {
+                    output << ", " << *it;
+                }
             }
+        } else {
+            output << argument.operator T();
         }
+
         return output;
     }
 

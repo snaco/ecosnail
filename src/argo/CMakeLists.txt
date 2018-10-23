@@ -2,5 +2,6 @@ ecosnail_project(
     DEPENDS
         tail
 
-    TESTS
+    EXAMPLES
+        basic
 )

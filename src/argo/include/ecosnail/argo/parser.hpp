@@ -24,6 +24,7 @@ public:
         ((_mapping[flags] = _arguments.size()), ...);
         auto data = std::make_shared<TypedArgumentData<Type>>();
         _arguments.push_back(data);
+        (data->flags.push_back(flags), ...);
         return Argument<Type>(data);
     }
 
@@ -46,9 +47,25 @@ public:
             }
         }
 
+        // After-parse checks
+        std::ostringstream problems;
+
         for (const auto& data : _arguments) {
-            check(!data->required || data->timesUsed > 0,
-                "required argument unused");
+            if (data->required && data->timesUsed == 0) {
+                problems << "required argument not used: ";
+                if (auto it = data->flags.begin(); it != data->flags.end()) {
+                    problems << *it++;
+                    for (; it != data->flags.end(); ++it) {
+                        problems << ", " << *it;
+                    }
+                }
+                problems << "\n";
+            }
+        }
+
+        auto problemsString = problems.str();
+        if (!problemsString.empty()) {
+            throw Exception(problemsString);
         }
     }
 
